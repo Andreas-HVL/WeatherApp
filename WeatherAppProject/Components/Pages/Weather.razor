@@ -3,59 +3,72 @@
 @using WeatherAppProject.Services
 @rendermode InteractiveServer
 @inject IJSRuntime JSRuntime
-@inject WeatherService weatherservice 
-
+@inject WeatherService weatherservice
 
 <PageTitle>Weather</PageTitle>
 
 <h1>Weather</h1>
-<button @onclick = "RefreshWidget">Refresh Data</button>
-<div>
-    <label for="clicked" class="form-label">if it works:</label>
-    <input type="text" class="form-control" id="clicked" placeholder="Enter Surname" @bind="clicked"/>
-</div>
-
-<div id="openweathermap-widget-15"></div>
-<script>
-    window.myWidgetParam ? window.myWidgetParam : window.myWidgetParam = [];
-    window.myWidgetParam.push({
-        id: 15,
-        cityid: @cityId,
-        appid: @apiKey,
-        units: 'metric',
-        containerid: 'openweathermap-widget-15',
-    });
-    (function () {
-        var script = document.createElement('script');
-        script.async = true;
-        script.charset = "utf-8";
-        script.src = "//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/weather-widget-generator.js";
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(script, s);
-    })();
-</script>
 <select @bind="cityId">
     <option value="2711537">Stockholm</option>
     <option value="5128581">New York</option>
     <option value="2643743">London</option>
+    <option value="1850147">Tokyo</option>
+    <option value="5368361">Los Angeles</option>
+    <option value="1816670">Beijing</option>
+    <option value="2711537">Gothenburg</option>
+    <option value="2988507">Paris</option>
+    <option value="3128760">Barcelona</option>
 </select>
 
-@code{
-    private string clicked;
-    private string cityId = "2711537"; // Default city ID (e.g., Stockholm)
-    private const string apiKey = "5f547e530c9e01e06ac39e2efeab164c";
+<button @onclick="RefreshWidget">Refresh Data</button>
+
+<div>
+    <label for="clicked" class="form-label">If it works:</label>
+    <input type="text" class="form-control" id="clicked" placeholder="Click Refresh" @bind="clicked" />
+</div>
+
+<div id="openweathermap-widget-15"></div>
+<div class=" mb-3">
+    <script>
+        function loadWeatherWidget(cityId, apiKey) {
+            // Remove the existing widget container
+            const widgetContainer = document.getElementById('openweathermap-widget-15');
+            widgetContainer.innerHTML = ''; // Clear the existing content
+
+            // Clear existing widget parameters
+            window.myWidgetParam = [];
+
+            // Add new widget parameters
+            window.myWidgetParam.push({
+                id: 15,
+                cityid: @cityId,
+                appid: @apiKey,
+                units: 'metric',
+                containerid: 'openweathermap-widget-15',
+            });
+
+            // Load the widget script
+            const script = document.createElement('script');
+            script.async = true;
+            script.charset = "utf-8";
+            script.src = "//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/weather-widget-generator.js";
+            document.getElementsByTagName('head')[0].appendChild(script);
+        }
+    </script>
+
+</div>
 
 
-    protected override async Task OnInitializedAsync()
-    {
-        
-
-    }
+@code {
+    private string cityId = "2711537"; // Default city ID
+    private const string apiKey = "5f547e530c9e01e06ac39e2efeab164c"; // OpenWeather API Key
+    private string? clicked;
 
     private async Task RefreshWidget()
     {
-        await JSRuntime.InvokeVoidAsync("loadWeatherWidget",cityId, apiKey);
+        Console.WriteLine("Button clicked"); // Debugging log
+        await JSRuntime.InvokeVoidAsync("loadWeatherWidget", cityId, apiKey);
         clicked = "I've been clicked";
+        StateHasChanged(); // Force UI update if necessary
     }
-
 }

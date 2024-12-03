@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "zH5SnDA3Hw5n2F2m+vgSojMI4SnBH4SsvQpKxuXMMmk=",
+  "Hash": "mPsWwcfuykCf0V9lOotgKmfx5blCayTJhyn08+8yOHE=",
   "Source": "WeatherAppProject",
   "BasePath": "_content/WeatherAppProject",
   "Mode": "Default",
@@ -10,17 +10,17 @@
     {
       "Name": "WeatherAppProject\\wwwroot",
       "Source": "WeatherAppProject",
-      "ContentRoot": "C:\\Users\\46707\\source\\repos\\WeatherAppProject\\WeatherAppProject\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\wwwroot\\",
       "BasePath": "_content/WeatherAppProject",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "C:\\Users\\46707\\source\\repos\\WeatherAppProject\\WeatherAppProject\\obj\\Debug\\net8.0\\scopedcss\\bundle\\WeatherAppProject.styles.css",
+      "Identity": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\obj\\Debug\\net8.0\\scopedcss\\bundle\\WeatherAppProject.styles.css",
       "SourceId": "WeatherAppProject",
       "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\46707\\source\\repos\\WeatherAppProject\\WeatherAppProject\\obj\\Debug\\net8.0\\scopedcss\\bundle\\",
+      "ContentRoot": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\obj\\Debug\\net8.0\\scopedcss\\bundle\\",
       "BasePath": "_content/WeatherAppProject",
       "RelativePath": "WeatherAppProject.styles.css",
       "AssetKind": "All",
@@ -33,13 +33,13 @@
       "AssetTraitValue": "ApplicationBundle",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Users\\46707\\source\\repos\\WeatherAppProject\\WeatherAppProject\\obj\\Debug\\net8.0\\scopedcss\\bundle\\WeatherAppProject.styles.css"
+      "OriginalItemSpec": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\obj\\Debug\\net8.0\\scopedcss\\bundle\\WeatherAppProject.styles.css"
     },
     {
-      "Identity": "C:\\Users\\46707\\source\\repos\\WeatherAppProject\\WeatherAppProject\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\WeatherAppProject.bundle.scp.css",
+      "Identity": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\WeatherAppProject.bundle.scp.css",
       "SourceId": "WeatherAppProject",
       "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\46707\\source\\repos\\WeatherAppProject\\WeatherAppProject\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\",
+      "ContentRoot": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\",
       "BasePath": "_content/WeatherAppProject",
       "RelativePath": "WeatherAppProject.bundle.scp.css",
       "AssetKind": "All",
@@ -52,13 +52,13 @@
       "AssetTraitValue": "ProjectBundle",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Users\\46707\\source\\repos\\WeatherAppProject\\WeatherAppProject\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\WeatherAppProject.bundle.scp.css"
+      "OriginalItemSpec": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\WeatherAppProject.bundle.scp.css"
     },
     {
-      "Identity": "C:\\Users\\46707\\source\\repos\\WeatherAppProject\\WeatherAppProject\\wwwroot\\app.css",
+      "Identity": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\wwwroot\\app.css",
       "SourceId": "WeatherAppProject",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\46707\\source\\repos\\WeatherAppProject\\WeatherAppProject\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\wwwroot\\",
       "BasePath": "_content/WeatherAppProject",
       "RelativePath": "app.css",
       "AssetKind": "All",
@@ -74,10 +74,10 @@
       "OriginalItemSpec": "wwwroot\\app.css"
     },
     {
-      "Identity": "C:\\Users\\46707\\source\\repos\\WeatherAppProject\\WeatherAppProject\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "Identity": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\wwwroot\\bootstrap\\bootstrap.min.css",
       "SourceId": "WeatherAppProject",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\46707\\source\\repos\\WeatherAppProject\\WeatherAppProject\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\wwwroot\\",
       "BasePath": "_content/WeatherAppProject",
       "RelativePath": "bootstrap/bootstrap.min.css",
       "AssetKind": "All",
@@ -93,10 +93,10 @@
       "OriginalItemSpec": "wwwroot\\bootstrap\\bootstrap.min.css"
     },
     {
-      "Identity": "C:\\Users\\46707\\source\\repos\\WeatherAppProject\\WeatherAppProject\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "Identity": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\wwwroot\\bootstrap\\bootstrap.min.css.map",
       "SourceId": "WeatherAppProject",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\46707\\source\\repos\\WeatherAppProject\\WeatherAppProject\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\wwwroot\\",
       "BasePath": "_content/WeatherAppProject",
       "RelativePath": "bootstrap/bootstrap.min.css.map",
       "AssetKind": "All",
@@ -112,10 +112,10 @@
       "OriginalItemSpec": "wwwroot\\bootstrap\\bootstrap.min.css.map"
     },
     {
-      "Identity": "C:\\Users\\46707\\source\\repos\\WeatherAppProject\\WeatherAppProject\\wwwroot\\favicon.png",
+      "Identity": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\wwwroot\\favicon.png",
       "SourceId": "WeatherAppProject",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\46707\\source\\repos\\WeatherAppProject\\WeatherAppProject\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\wwwroot\\",
       "BasePath": "_content/WeatherAppProject",
       "RelativePath": "favicon.png",
       "AssetKind": "All",

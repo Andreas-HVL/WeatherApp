@@ -1,64 +1,61 @@
-﻿@page "/weather"
-@attribute [StreamRendering]
+﻿@page "/WeatherData"
+@using Microsoft.JSInterop;
+@using WeatherAppProject.Services
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+@inject WeatherService weatherservice 
+
 
 <PageTitle>Weather</PageTitle>
 
 <h1>Weather</h1>
+<button @onclick = "RefreshWidget">Refresh Data</button>
+<div>
+    <label for="clicked" class="form-label">if it works:</label>
+    <input type="text" class="form-control" id="clicked" placeholder="Enter Surname" @bind="clicked"/>
+</div>
 
-<p>This component demonstrates showing data.</p>
+<div id="openweathermap-widget-15"></div>
+<script>
+    window.myWidgetParam ? window.myWidgetParam : window.myWidgetParam = [];
+    window.myWidgetParam.push({
+        id: 15,
+        cityid: @cityId,
+        appid: @apiKey,
+        units: 'metric',
+        containerid: 'openweathermap-widget-15',
+    });
+    (function () {
+        var script = document.createElement('script');
+        script.async = true;
+        script.charset = "utf-8";
+        script.src = "//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/weather-widget-generator.js";
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(script, s);
+    })();
+</script>
+<select @bind="cityId">
+    <option value="2711537">Stockholm</option>
+    <option value="5128581">New York</option>
+    <option value="2643743">London</option>
+</select>
 
-@if (forecasts == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+@code{
+    private string clicked;
+    private string cityId = "2711537"; // Default city ID (e.g., Stockholm)
+    private const string apiKey = "5f547e530c9e01e06ac39e2efeab164c";
 
-@code {
-    private WeatherForecast[]? forecasts;
 
     protected override async Task OnInitializedAsync()
     {
-        // Simulate asynchronous loading to demonstrate streaming rendering
-        await Task.Delay(500);
+        
 
-        var startDate = DateOnly.FromDateTime(DateTime.Now);
-        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
-        {
-            Date = startDate.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = summaries[Random.Shared.Next(summaries.Length)]
-        }).ToArray();
     }
 
-    private class WeatherForecast
+    private async Task RefreshWidget()
     {
-        public DateOnly Date { get; set; }
-        public int TemperatureC { get; set; }
-        public string? Summary { get; set; }
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        await JSRuntime.InvokeVoidAsync("loadWeatherWidget",cityId, apiKey);
+        clicked = "I've been clicked";
     }
+
 }

@@ -1,8 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "OtUGOI6nQFg9bd00k+ILUliOXHAkGI5pYDlXo80c/B6v5Lue6pkGB2PiSgTj7E4LiOKv6twWBATV0mqK9ghihA==",
+  "dgSpecHash": "4BEzOn2hdWccl2bFVe/RnCpULdXKVPU88o/poo060UnzYMuYSL0fxfXZJWuCIDq++cUb6VB++feUNBtjsYmSQg==",
   "success": true,
   "projectFilePath": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\WeatherAppProject.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\46707\\.nuget\\packages\\system.io.pipelines\\9.0.0\\system.io.pipelines.9.0.0.nupkg.sha512",
+    "C:\\Users\\46707\\.nuget\\packages\\system.net.http.json\\9.0.0\\system.net.http.json.9.0.0.nupkg.sha512",
+    "C:\\Users\\46707\\.nuget\\packages\\system.text.encodings.web\\9.0.0\\system.text.encodings.web.9.0.0.nupkg.sha512",
+    "C:\\Users\\46707\\.nuget\\packages\\system.text.json\\9.0.0\\system.text.json.9.0.0.nupkg.sha512"
+  ],
   "logs": []
 }

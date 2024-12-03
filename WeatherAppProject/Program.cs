@@ -1,8 +1,10 @@
 using WeatherAppProject.Components;
+using WeatherAppProject.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddHttpClient<WeatherService>();
 // Add services to the container.
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 

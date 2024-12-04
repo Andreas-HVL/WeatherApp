@@ -1,13 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "PDIIpSvb46zMJVfI3aWpRO1XF8wsVB8hi7VbMGTkTNz2P2gbbJSqe7bloNS4k9fdVHicuQaUWTfAXwg7+oYVAg==",
+  "dgSpecHash": "af5TMnGYSUo=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Andreas\\Source\\Repos\\WeatherApp\\WeatherAppProject\\WeatherAppProject.csproj",
+  "projectFilePath": "C:\\Users\\Hijaker\\Source\\Repos\\WeatherApp\\WeatherAppProject\\WeatherAppProject.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Andreas\\.nuget\\packages\\system.io.pipelines\\9.0.0\\system.io.pipelines.9.0.0.nupkg.sha512",
-    "C:\\Users\\Andreas\\.nuget\\packages\\system.net.http.json\\9.0.0\\system.net.http.json.9.0.0.nupkg.sha512",
-    "C:\\Users\\Andreas\\.nuget\\packages\\system.text.encodings.web\\9.0.0\\system.text.encodings.web.9.0.0.nupkg.sha512",
-    "C:\\Users\\Andreas\\.nuget\\packages\\system.text.json\\9.0.0\\system.text.json.9.0.0.nupkg.sha512"
+    "C:\\Users\\Hijaker\\.nuget\\packages\\system.io.pipelines\\9.0.0\\system.io.pipelines.9.0.0.nupkg.sha512",
+    "C:\\Users\\Hijaker\\.nuget\\packages\\system.net.http.json\\9.0.0\\system.net.http.json.9.0.0.nupkg.sha512",
+    "C:\\Users\\Hijaker\\.nuget\\packages\\system.text.encodings.web\\9.0.0\\system.text.encodings.web.9.0.0.nupkg.sha512",
+    "C:\\Users\\Hijaker\\.nuget\\packages\\system.text.json\\9.0.0\\system.text.json.9.0.0.nupkg.sha512"
   ],
   "logs": []
 }

@@ -1,23 +1,23 @@
 {
   "Files": [
     {
-      "Id": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\WeatherAppProject.bundle.scp.css",
+      "Id": "C:\\Users\\Hijaker\\Source\\Repos\\WeatherApp\\WeatherAppProject\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\WeatherAppProject.bundle.scp.css",
       "PackagePath": "staticwebassets\\WeatherAppProject.bundle.scp.css"
     },
     {
-      "Id": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\wwwroot\\app.css",
+      "Id": "C:\\Users\\Hijaker\\Source\\Repos\\WeatherApp\\WeatherAppProject\\wwwroot\\app.css",
       "PackagePath": "staticwebassets\\app.css"
     },
     {
-      "Id": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "Id": "C:\\Users\\Hijaker\\Source\\Repos\\WeatherApp\\WeatherAppProject\\wwwroot\\bootstrap\\bootstrap.min.css",
       "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css"
     },
     {
-      "Id": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "Id": "C:\\Users\\Hijaker\\Source\\Repos\\WeatherApp\\WeatherAppProject\\wwwroot\\bootstrap\\bootstrap.min.css.map",
       "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
     },
     {
-      "Id": "C:\\Users\\46707\\source\\repos\\WeatherApp\\WeatherAppProject\\wwwroot\\favicon.png",
+      "Id": "C:\\Users\\Hijaker\\Source\\Repos\\WeatherApp\\WeatherAppProject\\wwwroot\\favicon.png",
       "PackagePath": "staticwebassets\\favicon.png"
     },
     {

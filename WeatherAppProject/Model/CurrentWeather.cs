@@ -12,6 +12,8 @@ namespace WeatherAppProject.Model
         [JsonPropertyName("weather")]
         public Weather[] Weather { get; set; }
 
+        public int Timezone { get; set; }
+
     }
 
     public class Main

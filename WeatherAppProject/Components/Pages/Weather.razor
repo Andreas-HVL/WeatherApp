@@ -7,12 +7,17 @@
 
 <PageTitle>Weather Forecast</PageTitle>
 
-<h1 class="text-center">Weather Forecast</h1>
+<h1 class="text-center">Search Weather</h1>
+
+<div class="input-group mb-4 mx-auto" style="width:50%;">
+    <input type="text" @bind="searchCity" @bind:event="oninput" placeholder="Enter city name..." class="form-control" />
+    <button class="btn btn-primary" @onclick="OnSearchCity">Search</button>
+</div>
 
 @if (currentWeather != null)
 {
     <!-- Top Current Weather Layout -->
-   <div class="card mx-auto mb-4 p-4" style="width: 50%; text-align: center; background-color:#222; color:#fff; border-radius:15px;">
+    <div class="card mx-auto mb-4 p-4"style="width: 50%; text-align: center; border: none; border-radius: 15px; @GetBackgroundStyle(currentWeather.Weather[0].Description, currentWeather.Timezone); color:white">
        <h2 class="mb-3" style="font-size:2rem; font-weight:bold;">@currentWeather.Name</h2>
        
        <!-- Large Temperature and Icon -->
@@ -21,42 +26,52 @@
             @if(currentWeather.Weather.Length > 0)
             {
                 var iconUrl = $"https://openweathermap.org/img/wn/{currentWeather.Weather[0].Icon}@4x.png";
-                <img src="@iconUrl" alt="Weather Icon" style="width:100px; height:100px; margin-left:10px"/>
+                <img src="@iconUrl" alt="Weather Icon" style="width:100px; height:100px; margin-left:10px;"/>
             }
-        </div>
+       </div>
 
         <!-- Weather Description -->
-        <p class="mb-0" style="font-size:1.25rem; font-weight:500;">@currentWeather.Weather[0].Description</p>
+        <p class="mb-0" style="font-size:1.5rem; font-weight:500;">@currentWeather.Weather[0].Description</p>
 
         <!-- High and Low Temperature -->
             @if(dailyForecasts.Count > 0)
             {
                 var todayForecast = dailyForecasts.First();
-                <p class="mt-2" style="font-size: 1rem;">
-                    Highest @todayForecast.TempMax° · Lowest @todayForecast.TempMin
+                <p class="mt-2" style="font-size: 1.5rem;">
+                Highest @todayForecast.TempMax° · Lowest @todayForecast.TempMin °
                 </p>
 
             }
    </div>
     <!-- Hourly Forecast -->
-    <div class="card mx-auto mb-4 p-3" style="width: 70%; background-color: #222; color: #fff;">
-        <h5 class="text-center mb-3">Prognos per 3 timmar</h5>
-        <div class="d-flex justify-content-around overflow-auto" style="font-size:larger">
-            @foreach (var item in hourlyForecasts)
-            {
-                var iconUrl = $"https://openweathermap.org/img/wn/{item.Icon}@2x.png";
-                <div class="text-center" style="min-width: 60px;">
-                    <p class="mb-1">@item.Time</p>
-                    <img src="@iconUrl" alt="Weather Icon" style="width: 80px; height: 80px;" />
-                    <p class="mb-0">@item.Temp°C</p>
-                </div>
-            }
+    @if (hourlyForecasts?.Count > 0)
+    {
+        var representativeCondition = hourlyForecasts.First().Condition;
+         <!-- Representative condition -->
+        var cardBackgroundStyle = GetBackgroundStyle(representativeCondition, currentWeather.Timezone);
+         <!-- Get card style -->
+
+        <div class="card mx-auto mb-4 p-3" style="width: 70%; @cardBackgroundStyle">
+            <h5 class="text-center mb-3">3-Hour Forecast</h5>
+            <div class="d-flex justify-content-around overflow-auto">
+                @foreach (var item in hourlyForecasts)
+                {
+                    var iconUrl = $"https://openweathermap.org/img/wn/{item.Icon}@2x.png";
+
+                    <div class="text-center p-2" style="min-width: 80px;">
+                        <p class="mb-1 fs-5">@item.Time</p>
+                        <img src="@iconUrl" alt="Weather Icon" style="width: 100px; height: 100px;" />
+                        <p class="mb-0 fs-5 fw-bold">@item.Temp°C</p>
+                        <p class="mb-0 fs-6">@item.Condition</p>
+                    </div>
+                }
+            </div>
         </div>
-    </div>
+    }
 
     <!-- Daily Forecast -->
     <div class="card mx-auto p-3" style="width: 70%; background-color: #222; color: #fff;">
-        <h5 class="text-center mb-3">5-dagarsprognos</h5>
+        <h5 class="text-center mb-3">5-Days Forecast</h5>
         <div class="d-flex justify-content-around flex-wrap" style="font-size:larger">
             @foreach (var dailyForecast in dailyForecasts)
             {
@@ -80,11 +95,34 @@ else
     private CurrentWeather currentWeather;
     private List<HourlyForecast> hourlyForecasts = new();
     private List<DailyForecast> dailyForecasts = new();
-
+    private string searchCity = string.Empty;
     protected override async Task OnInitializedAsync()
     {
         await FetchWeatherData("Gothenburg");
     }
+
+    private async Task OnSearchCity()
+    {
+        if (!string.IsNullOrWhiteSpace(searchCity))
+        {
+            try
+            {
+                currentWeather = await weatherservice.GetWeatherAsync(searchCity);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"error searching city..." + ex.Message);
+                currentWeather = null;
+
+            }
+
+        }
+        else
+        {
+            Console.WriteLine("please enter a valid city name.");
+        }
+    }
+
 
     private async Task FetchWeatherData(string city)
     {
@@ -94,11 +132,14 @@ else
             var forecast = await weatherservice.GetWeatherForecastAsync(city);
 
             // Map hourly forecast
-            hourlyForecasts = forecast.List.Take(8).Select(item => new HourlyForecast
+            hourlyForecasts = forecast.List
+            .Take(8)
+            .Select(item => new HourlyForecast
                 {
                     Time = DateTime.Parse(item.Dt_txt).ToShortTimeString(),
                     Temp = (int)Math.Round(item.main.Temp),
-                    Icon = item.weather[0].Icon
+                    Icon = item.weather[0].Icon,
+                    Condition = item.weather[0].Description
                 }).ToList();
 
             // Map daily forecast (group by day)
@@ -119,5 +160,32 @@ else
         {
             Console.WriteLine($"Error fetching weather data: {ex.Message}");
         }
+    }
+
+    private string GetBackgroundStyle(string weatherCondition, int timezoneOffset)
+    {
+        var utcNow = DateTime.UtcNow;
+        var cityTime = utcNow.AddSeconds(timezoneOffset);
+        bool isNight = cityTime.Hour < 6 || cityTime.Hour >= 18;
+
+
+        if (isNight)
+        {
+            // Always return a dark color at night
+            return "background-color: #222; color: #fff;"; // Dark Blue for night
+        }
+
+        var backgroundColor = weatherCondition.ToLower() switch
+        {
+            "clear sky" or "sunny" => "background-color: #87CEEB; color: #000;",    // Sky blue
+            "few clouds" => "background-color: #B0E0E6; color: #000;",             // Light blue
+            "scattered clouds" or "cloudy" => "background-color: #D3D3D3; color: #000;", // Light gray
+            "rain" or "shower rain" => "background-color: #4682B4; color: white;", // Steel blue
+            "thunderstorm" => "background-color: #2F4F4F; color: white;",          // Dark slate gray
+            "snow" => "background-color: #FFFACD; color: #000;",                   // Light yellow
+            "mist" or "fog" => "background-color: #C0C0C0; color: #000;",          // Silver gray
+            _ => "background-color: #F0F8FF; color: #000;" // Default: Alice blue
+        };
+        return $"background-color: {backgroundColor}; color: white";
     }
 }

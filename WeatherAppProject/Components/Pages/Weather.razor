@@ -23,43 +23,55 @@
     <div class="card my-3">
         <div class="card-body">
             <h4>Current Weather in @currentWeather.Name</h4>
-            <p>Temperature:@(Math.Round(currentWeather.Main.Temp))°C</p>
-            <p>Humidity: @currentWeather.Main.Humidity%</p>
-            <p>Condition:@currentWeather.Weather[0].Description</p>
+            @if (currentWeather.Main != null)
+            {
+                <p>Temperature: @(Math.Round(currentWeather.Main.Temp))°C</p>
+                <p>Humidity: @currentWeather.Main.Humidity%</p>
+            }
+            @if (currentWeather.Weather != null && currentWeather.Weather.Length > 0)
+            {
+                <p>Condition: @currentWeather.Weather[0].Description</p>
+            }
         </div>
     </div>
 
-}
-else
-{
-    <p>There was an Error loading the API.</p>
-}
+    @if (dailyForecasts?.Count > 0)
+    {
+        <div class="accordion" id="weatherAccordion">
+            @foreach (var dailyForecast in dailyForecasts)
+            {
+                var collapseId = $"collapse-{dailyForecast.Date.Day}";
+                <div class="card">
+                    <div class="card-header" id="heading-@dailyForecast.Date.Day">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                                @dailyForecast.DayName - Temp: @dailyForecast.Temp°C, Condition: @dailyForecast.Condition
+                            </button>
+                        </h5>
+                    </div>
 
-@if (forecastWeather != null && forecastWeather.List.Count > 0)
-{
-    <div class="d-flex flex-wrap">
-        @foreach(var forecast in forecastWeather.List.Take(3)) // takes 3 upcoming days.
-        {
-            <div class="card m-2" style="width: 18rem;">
-                <div class="card-body">
-                    <h5 class="card-title">@forecast.Dt_txt</h5>
-                    <p>Temp:@(Math.Round(forecast.main.Temp))°C</p>
-                    <p>Condition:@(forecast.weather !=null ? forecast.weather[0]?.Description : "No Data")</p>
+                    <div id="@collapseId" class="collapse" aria-labelledby="heading-@dailyForecast.Date.Day" data-parent="#weatherAccordion">
+                        <div class="card-body">
+                            @foreach (var item in dailyForecast.HourlyForecasts)
+                            {
+                                <p>
+                                    <strong>@item.Time:</strong> @item.Temp°C, @item.Condition
+                                </p>
+                            }
+                        </div>
+                    </div>
                 </div>
-            </div>
-        }
-    </div>
+            }
+        </div>
+    }
 }
-else
-{
-    <p>No data available for forecasting try again later.</p>
-}
-
 
 @code {
     private string selectedCity = "Gothenburg";
     private CurrentWeather currentWeather;
     private ForecastWeather forecastWeather;
+    private List<DailyForecast> dailyForecasts = new();
+
 
     private List<string> Cities = new List<string> {"London",
     "New York", "Gothenburg", "Tokyo", "Sydney", "Stockholm", "Paris"};
@@ -73,9 +85,7 @@ else
     private async Task OnCityChange(ChangeEventArgs e)
     {
         selectedCity = e.Value.ToString();
-        currentWeather = await weatherservice.GetWeatherAsync(selectedCity);
-        forecastWeather = await weatherservice.GetWeatherForecastAsync(selectedCity);
-
+        await FetchWeatherData(selectedCity);
     }
 
     private async Task FetchWeatherData(string city)
@@ -84,11 +94,33 @@ else
         {
             currentWeather = await weatherservice.GetWeatherAsync(city);
             forecastWeather = await weatherservice.GetWeatherForecastAsync(city);
+
+            if (forecastWeather?.List != null)
+            {
+                dailyForecasts = forecastWeather.List
+                    .GroupBy(item => DateTime.Parse(item.Dt_txt).Date)
+                    .Select(group => new DailyForecast
+                        {
+                            Date = group.Key,
+                            DayName = group.Key.DayOfWeek.ToString(),
+                            Temp = (int)Math.Round(group.First().main.Temp),
+                            Condition = group.First().weather[0].Description,
+                            HourlyForecasts = group.Select(item => new HourlyForecast
+                            {
+                                Time = DateTime.Parse(item.Dt_txt).ToShortTimeString(),
+                                Temp = (int)Math.Round(item.main.Temp),
+                                Condition = item.weather[0].Description
+                            }).ToList()
+                        })
+                    .Take(3)
+                    .ToList();
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching weather data: {ex.Message}");
         }
     }
-
+        
+    
 }

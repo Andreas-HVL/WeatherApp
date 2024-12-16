@@ -138,3 +138,5 @@ C:\Users\DersimAbbas\Source\Repos\WeatherApp\WeatherAppProject\obj\Debug\net8.0\
 C:\Users\DersimAbbas\Source\Repos\WeatherApp\WeatherAppProject\obj\Debug\net8.0\WeatherAppProject.pdb
 C:\Users\DersimAbbas\Source\Repos\WeatherApp\WeatherAppProject\obj\Debug\net8.0\WeatherAppProject.genruntimeconfig.cache
 C:\Users\DersimAbbas\Source\Repos\WeatherApp\WeatherAppProject\obj\Debug\net8.0\ref\WeatherAppProject.dll
+C:\Users\DersimAbbas\Source\Repos\WeatherApp\WeatherAppProject\obj\Debug\net8.0\WeatherAppProject.RazorAssemblyInfo.cache
+C:\Users\DersimAbbas\Source\Repos\WeatherApp\WeatherAppProject\obj\Debug\net8.0\WeatherAppProject.RazorAssemblyInfo.cs

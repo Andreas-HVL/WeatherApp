@@ -5,87 +5,85 @@
 @rendermode InteractiveServer
 @inject WeatherService weatherservice
 
+<PageTitle>Weather Forecast</PageTitle>
 
-<PageTitle>Weather</PageTitle>
-
-<h1>Weather</h1>
-
-<select @onchange="OnCityChange" class="form-select">
-    <option disabled selected>Select a city</option>
-    @foreach(var city in Cities)
-    {
-        <option value="@city">@city</option>
-    }
-</select>
+<h1 class="text-center">Weather Forecast</h1>
 
 @if (currentWeather != null)
 {
-    <div class="card my-3">
-        <div class="card-body">
-            <h4>Current Weather in @currentWeather.Name</h4>
-            @if (currentWeather.Main != null)
+    <!-- Top Current Weather Layout -->
+   <div class="card mx-auto mb-4 p-4" style="width: 50%; text-align: center; background-color:#222; color:#fff; border-radius:15px;">
+       <h2 class="mb-3" style="font-size:2rem; font-weight:bold;">@currentWeather.Name</h2>
+       
+       <!-- Large Temperature and Icon -->
+       <div class="d-flex justify-content-center align-items-center">
+            <span style="font-size:4rem; font-weight:bold;">@(Math.Round(currentWeather.Main.Temp))°</span>
+            @if(currentWeather.Weather.Length > 0)
             {
-                <p>Temperature: @(Math.Round(currentWeather.Main.Temp))°C</p>
-                <p>Humidity: @currentWeather.Main.Humidity%</p>
+                var iconUrl = $"https://openweathermap.org/img/wn/{currentWeather.Weather[0].Icon}@4x.png";
+                <img src="@iconUrl" alt="Weather Icon" style="width:100px; height:100px; margin-left:10px"/>
             }
-            @if (currentWeather.Weather != null && currentWeather.Weather.Length > 0)
+        </div>
+
+        <!-- Weather Description -->
+        <p class="mb-0" style="font-size:1.25rem; font-weight:500;">@currentWeather.Weather[0].Description</p>
+
+        <!-- High and Low Temperature -->
+            @if(dailyForecasts.Count > 0)
             {
-                <p>Condition: @currentWeather.Weather[0].Description</p>
+                var todayForecast = dailyForecasts.First();
+                <p class="mt-2" style="font-size: 1rem;">
+                    Highest @todayForecast.TempMax° · Lowest @todayForecast.TempMin
+                </p>
+
+            }
+   </div>
+    <!-- Hourly Forecast -->
+    <div class="card mx-auto mb-4 p-3" style="width: 70%; background-color: #222; color: #fff;">
+        <h5 class="text-center mb-3">Prognos per 3 timmar</h5>
+        <div class="d-flex justify-content-around overflow-auto" style="font-size:larger">
+            @foreach (var item in hourlyForecasts)
+            {
+                var iconUrl = $"https://openweathermap.org/img/wn/{item.Icon}@2x.png";
+                <div class="text-center" style="min-width: 60px;">
+                    <p class="mb-1">@item.Time</p>
+                    <img src="@iconUrl" alt="Weather Icon" style="width: 80px; height: 80px;" />
+                    <p class="mb-0">@item.Temp°C</p>
+                </div>
             }
         </div>
     </div>
 
-    @if (dailyForecasts?.Count > 0)
-    {
-        <div class="accordion" id="weatherAccordion">
+    <!-- Daily Forecast -->
+    <div class="card mx-auto p-3" style="width: 70%; background-color: #222; color: #fff;">
+        <h5 class="text-center mb-3">5-dagarsprognos</h5>
+        <div class="d-flex justify-content-around flex-wrap" style="font-size:larger">
             @foreach (var dailyForecast in dailyForecasts)
             {
-                var collapseId = $"collapse-{dailyForecast.Date.Day}";
-                <div class="card">
-                    <div class="card-header" id="heading-@dailyForecast.Date.Day">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
-                                @dailyForecast.DayName - Temp: @dailyForecast.Temp°C, Condition: @dailyForecast.Condition
-                            </button>
-                        </h5>
-                    </div>
-
-                    <div id="@collapseId" class="collapse" aria-labelledby="heading-@dailyForecast.Date.Day" data-parent="#weatherAccordion">
-                        <div class="card-body">
-                            @foreach (var item in dailyForecast.HourlyForecasts)
-                            {
-                                <p>
-                                    <strong>@item.Time:</strong> @item.Temp°C, @item.Condition
-                                </p>
-                            }
-                        </div>
-                    </div>
+                var iconUrl = $"https://openweathermap.org/img/wn/{dailyForecast.Icon}@2x.png";
+                <div class="text-center mx-2 mb-2" style="min-width: 80px;">
+                    <p class="mb-1">@dailyForecast.DayName</p>
+                    <img src="@iconUrl" alt="Weather Icon" style="width: 100px; height: 100px;" />
+                    <p class="mb-0">@dailyForecast.TempMax°C / @dailyForecast.TempMin°C</p>
+                    <p class="mb-0">@dailyForecast.ChanceOfRain%</p>
                 </div>
             }
         </div>
-    }
+    </div>
+}
+else
+{
+    <p class="text-center">Loading weather data...</p>
 }
 
 @code {
-    private string selectedCity = "Gothenburg";
     private CurrentWeather currentWeather;
-    private ForecastWeather forecastWeather;
+    private List<HourlyForecast> hourlyForecasts = new();
     private List<DailyForecast> dailyForecasts = new();
-
-
-    private List<string> Cities = new List<string> {"London",
-    "New York", "Gothenburg", "Tokyo", "Sydney", "Stockholm", "Paris"};
 
     protected override async Task OnInitializedAsync()
     {
-        // Fetch weather for the default city (Gothenburg)
-        await FetchWeatherData(selectedCity);
-    }
-
-    private async Task OnCityChange(ChangeEventArgs e)
-    {
-        selectedCity = e.Value.ToString();
-        await FetchWeatherData(selectedCity);
+        await FetchWeatherData("Gothenburg");
     }
 
     private async Task FetchWeatherData(string city)
@@ -93,34 +91,33 @@
         try
         {
             currentWeather = await weatherservice.GetWeatherAsync(city);
-            forecastWeather = await weatherservice.GetWeatherForecastAsync(city);
+            var forecast = await weatherservice.GetWeatherForecastAsync(city);
 
-            if (forecastWeather?.List != null)
-            {
-                dailyForecasts = forecastWeather.List
-                    .GroupBy(item => DateTime.Parse(item.Dt_txt).Date)
-                    .Select(group => new DailyForecast
-                        {
-                            Date = group.Key,
-                            DayName = group.Key.DayOfWeek.ToString(),
-                            Temp = (int)Math.Round(group.First().main.Temp),
-                            Condition = group.First().weather[0].Description,
-                            HourlyForecasts = group.Select(item => new HourlyForecast
-                            {
-                                Time = DateTime.Parse(item.Dt_txt).ToShortTimeString(),
-                                Temp = (int)Math.Round(item.main.Temp),
-                                Condition = item.weather[0].Description
-                            }).ToList()
-                        })
-                    .Take(3)
-                    .ToList();
-            }
+            // Map hourly forecast
+            hourlyForecasts = forecast.List.Take(8).Select(item => new HourlyForecast
+                {
+                    Time = DateTime.Parse(item.Dt_txt).ToShortTimeString(),
+                    Temp = (int)Math.Round(item.main.Temp),
+                    Icon = item.weather[0].Icon
+                }).ToList();
+
+            // Map daily forecast (group by day)
+            dailyForecasts = forecast.List
+                .GroupBy(item => DateTime.Parse(item.Dt_txt).Date)
+                .Select(group => new DailyForecast
+                    {
+                        DayName = group.Key.DayOfWeek.ToString(),
+                        TempMax = (int)Math.Round(group.Max(x => x.main.Temp)),
+                        TempMin = (int)Math.Round(group.Min(x => x.main.Temp)),
+                        ChanceOfRain = group.First().Pop * 100, // Probability of precipitation
+                        Icon = group.First().weather[0].Icon
+                    })
+                .Take(5) // Next 5 days
+                .ToList();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching weather data: {ex.Message}");
         }
     }
-        
-    
 }

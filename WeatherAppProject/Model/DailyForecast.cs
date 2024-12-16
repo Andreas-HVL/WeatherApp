@@ -9,7 +9,11 @@ namespace WeatherAppProject.Model
         public string DayName { get; set; } // Day of the week, e.g., Monday
         public int Temp { get; set; } // Representative temperature
         public string Condition { get; set; } // Weather condition
+        public int TempMax { get; set; }
+        public int TempMin { get; set; }
+        public  double ChanceOfRain { get; set; }
         public List<HourlyForecast> HourlyForecasts { get; set; } // 3-hour forecasts
+        public string Icon { get; set; }
 
     }
 }

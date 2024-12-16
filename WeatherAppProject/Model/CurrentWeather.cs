@@ -12,7 +12,17 @@ namespace WeatherAppProject.Model
         [JsonPropertyName("weather")]
         public Weather[] Weather { get; set; }
 
+        [JsonPropertyName("timezone")]
         public int Timezone { get; set; }
+
+        public string Time {  get; set; }
+
+        [JsonPropertyName("dt_txt")]
+        public string dt { get; set; }
+
+        [JsonPropertyName("pop")]
+        public double Pop { get; set; } // Probability of precipitation (0.0 - 1.0)
+
 
     }
 
@@ -23,6 +33,9 @@ namespace WeatherAppProject.Model
 
         [JsonPropertyName("humidity")]
         public int Humidity { get; set; }
+
+        public double TempMax { get; set; }
+        public double TempMin { get; set; }
     }
     public class Weather
     {

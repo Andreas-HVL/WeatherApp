@@ -6,6 +6,7 @@ namespace WeatherAppProject.Model
     {
         [JsonPropertyName("list")]
         public List<ListItem> List { get; set; }
+        public List<CurrentWeather> weatherList { get; set; }
     }
 
     public class ListItem
@@ -14,13 +15,15 @@ namespace WeatherAppProject.Model
         public Main main { get; set; }
 
         [JsonPropertyName("weather")]
-        public Weather[] weather { get; set; }
+        public Weather[] Weather { get; set; }
 
         [JsonPropertyName("dt_txt")]
-        public string Dt_txt { get; set; }
+        public string dt { get; set; }
 
         [JsonPropertyName("pop")]
         public double Pop { get; set; } // Probability of precipitation (0.0 - 1.0)
+
+
     }
     
 }

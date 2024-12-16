@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace WeatherAppProject.Model
 {
@@ -14,6 +15,10 @@ namespace WeatherAppProject.Model
         public  double ChanceOfRain { get; set; }
         public List<HourlyForecast> HourlyForecasts { get; set; } // 3-hour forecasts
         public string Icon { get; set; }
+        [JsonPropertyName("pop")]
+        public double Pop { get; set; } // Probability of precipitation (0.0 - 1.0)
+        [JsonPropertyName("dt_txt")]
+        public string dt { get; set; }
 
     }
 }

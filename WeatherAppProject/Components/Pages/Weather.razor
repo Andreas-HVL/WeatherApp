@@ -17,7 +17,7 @@
 @if (currentWeather != null)
 {
     <!-- Top Current Weather Layout -->
-    <div class="card mx-auto mb-4 p-4"style="width: 50%; text-align: center; border: none; border-radius: 15px; @GetBackgroundStyle(currentWeather.Weather[0].Description, currentWeather.Timezone); color:white">
+    <div class="card mx-auto mb-4 p-4"style="width: 50%; text-align: center; border: none; border-radius: 15px; @GetBackgroundStyle(currentWeather.Weather[0].Description, currentWeather.Timezone)">
        <h2 class="mb-3" style="font-size:2rem; font-weight:bold;">@currentWeather.Name</h2>
        
        <!-- Large Temperature and Icon -->
@@ -39,6 +39,7 @@
                 var todayForecast = dailyForecasts.First();
                 <p class="mt-2" style="font-size: 1.5rem;">
                 Highest @todayForecast.TempMax° · Lowest @todayForecast.TempMin °
+                Time: @todayForecast.dt
                 </p>
 
             }
@@ -96,32 +97,54 @@ else
     private List<HourlyForecast> hourlyForecasts = new();
     private List<DailyForecast> dailyForecasts = new();
     private string searchCity = string.Empty;
+    private List<ForecastWeather> weatherData = new();
     protected override async Task OnInitializedAsync()
     {
         await FetchWeatherData("Gothenburg");
     }
-
     private async Task OnSearchCity()
     {
         if (!string.IsNullOrWhiteSpace(searchCity))
         {
             try
             {
+                // Fetch current weather and forecast
                 currentWeather = await weatherservice.GetWeatherAsync(searchCity);
+                var forecast = await weatherservice.GetWeatherForecastAsync(searchCity);
+
+                // Calculate city-specific local time
+                var cityTime = DateTime.UtcNow.AddSeconds(currentWeather.Timezone);
+
+                // Process daily forecast
+                dailyForecasts = forecast.List
+                    .GroupBy(item => DateTime.Parse(item.dt).Date) // Correct grouping
+                    .Select(group => new DailyForecast
+                        {
+                            DayName = group.Key.DayOfWeek.ToString(),
+                            TempMax = (int)Math.Round(group.Max(x => x.main.TempMax)), // Use TempMax
+                            TempMin = (int)Math.Round(group.Min(x => x.main.TempMin)), // Use TempMin
+                            ChanceOfRain = group.First().Pop * 100,  // Precipitation
+                            Icon = group.First().Weather[0].Icon,   // Access first weather icon
+                            dt = cityTime.ToString("HH:mm")         // Adjusted city time
+                        })
+                    .ToList();
+
+                Console.WriteLine($"Local time in {currentWeather.Name}: {cityTime}");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Console.WriteLine($"error searching city..." + ex.Message);
+                Console.WriteLine($"Error searching city: " + ex.Message);
                 currentWeather = null;
-
             }
-
         }
         else
         {
-            Console.WriteLine("please enter a valid city name.");
+            Console.WriteLine("Please enter a valid city name.");
         }
     }
+
+
+
 
 
     private async Task FetchWeatherData(string city)
@@ -129,29 +152,34 @@ else
         try
         {
             currentWeather = await weatherservice.GetWeatherAsync(city);
-            var forecast = await weatherservice.GetWeatherForecastAsync(city);
 
+            var forecast = await weatherservice.GetWeatherForecastAsync(city);
+            var utcNow = DateTime.UtcNow;
+            var timezoneOffset = currentWeather.Timezone;
+            city = utcNow.AddSeconds(timezoneOffset).ToString();
             // Map hourly forecast
             hourlyForecasts = forecast.List
             .Take(8)
             .Select(item => new HourlyForecast
                 {
-                    Time = DateTime.Parse(item.Dt_txt).ToShortTimeString(),
+                    Time = DateTime.Parse(item.dt).ToShortTimeString(),
                     Temp = (int)Math.Round(item.main.Temp),
-                    Icon = item.weather[0].Icon,
-                    Condition = item.weather[0].Description
+                    Icon = item.Weather[0].Icon,
+                    Condition = item.Weather[0].Description
                 }).ToList();
 
             // Map daily forecast (group by day)
             dailyForecasts = forecast.List
-                .GroupBy(item => DateTime.Parse(item.Dt_txt).Date)
+                .GroupBy(item => DateTime.Parse(item.dt).Date)
                 .Select(group => new DailyForecast
                     {
                         DayName = group.Key.DayOfWeek.ToString(),
                         TempMax = (int)Math.Round(group.Max(x => x.main.Temp)),
                         TempMin = (int)Math.Round(group.Min(x => x.main.Temp)),
                         ChanceOfRain = group.First().Pop * 100, // Probability of precipitation
-                        Icon = group.First().weather[0].Icon
+                        Icon = group.First().Weather[0].Icon,
+
+
                     })
                 .Take(5) // Next 5 days
                 .ToList();
@@ -164,28 +192,34 @@ else
 
     private string GetBackgroundStyle(string weatherCondition, int timezoneOffset)
     {
+        // Adjust city-specific time
         var utcNow = DateTime.UtcNow;
         var cityTime = utcNow.AddSeconds(timezoneOffset);
         bool isNight = cityTime.Hour < 6 || cityTime.Hour >= 18;
 
-
+        // Always dark background for nighttime
         if (isNight)
         {
-            // Always return a dark color at night
-            return "background-color: #222; color: #fff;"; // Dark Blue for night
+            return "background-color: #222; color: white;";
         }
 
-        var backgroundColor = weatherCondition.ToLower() switch
+        // Normalize weather condition
+        var normalizedCondition = weatherCondition?.ToLower().Trim();
+
+        // Match conditions dynamically
+        var backgroundColor = normalizedCondition switch
         {
-            "clear sky" or "sunny" => "background-color: #87CEEB; color: #000;",    // Sky blue
-            "few clouds" => "background-color: #B0E0E6; color: #000;",             // Light blue
-            "scattered clouds" or "cloudy" => "background-color: #D3D3D3; color: #000;", // Light gray
-            "rain" or "shower rain" => "background-color: #4682B4; color: white;", // Steel blue
-            "thunderstorm" => "background-color: #2F4F4F; color: white;",          // Dark slate gray
-            "snow" => "background-color: #FFFACD; color: #000;",                   // Light yellow
-            "mist" or "fog" => "background-color: #C0C0C0; color: #000;",          // Silver gray
-            _ => "background-color: #F0F8FF; color: #000;" // Default: Alice blue
+            "clear sky" or "sunny" => "background-color: #87CEEB; color: #000;",      // Sky blue
+            "few clouds" => "background-color: #B0E0E6; color: #000;",               // Light blue
+            "scattered clouds" => "background-color: #D3D3D3; color: #000;",         // Light gray
+            "broken clouds" or "cloudy" => "background-color: #A9A9A9; color: #000;",// Dark gray
+            "shower rain" or "rain" => "background-color: #4682B4; color: white;",   // Steel blue
+            "thunderstorm" => "background-color: #2F4F4F; color: white;",            // Dark slate gray
+            "snow" => "background-color: #FFFACD; color: #000;",                     // Light yellow
+            "mist" or "fog" => "background-color: #C0C0C0; color: #000;",            // Silver gray
+            _ => "background-color: #F0F8FF; color: #000;"                           // Default (Alice blue)
         };
-        return $"background-color: {backgroundColor}; color: white";
+
+        return backgroundColor;
     }
 }

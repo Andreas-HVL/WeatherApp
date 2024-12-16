@@ -1,83 +1,94 @@
 ﻿@page "/WeatherData"
 @using Microsoft.JSInterop;
 @using WeatherAppProject.Services
+@using WeatherAppProject.Model
 @rendermode InteractiveServer
-@inject IJSRuntime JSRuntime
 @inject WeatherService weatherservice
+
 
 <PageTitle>Weather</PageTitle>
 
 <h1>Weather</h1>
 
-<select @bind="cityId">
-    <option selected>Select a City</option>
-    <option value="2673730">Stockholm</option>
-    <option value="5128581">New York</option>
-    <option value="2643743">London</option>
-    <option value="1850147">Tokyo</option>
-    <option value="5368361">Los Angeles</option>
-    <option value="1816670">Beijing</option>
-    <option value="2711537">Gothenburg</option>
-    <option value="2988507">Paris</option>
-    <option value="3128760">Barcelona</option>
+<select @onchange="OnCityChange" class="form-select">
+    <option disabled selected>Select a city</option>
+    @foreach(var city in Cities)
+    {
+        <option value="@city">@city</option>
+    }
 </select>
 
-<button
-    class="btn btn-success"
-    @onclick="RefreshWidget"
-    disabled="@(string.IsNullOrEmpty(cityId))">
-    Refresh Data
-</button>
+@if (currentWeather != null)
+{
+    <div class="card my-3">
+        <div class="card-body">
+            <h4>Current Weather in @currentWeather.Name</h4>
+            <p>Temperature:@(Math.Round(currentWeather.Main.Temp))°C</p>
+            <p>Humidity: @currentWeather.Main.Humidity%</p>
+            <p>Condition:@currentWeather.Weather[0].Description</p>
+        </div>
+    </div>
 
+}
+else
+{
+    <p>There was an Error loading the API.</p>
+}
 
-
-
-<div id="openweathermap-widget-15"></div>
-<div class=" mb-3">
-    <script>
-        function loadWeatherWidget(cityId, apiKey) {
-            // Remove the existing widget container
-            const widgetContainer = document.getElementById('openweathermap-widget-15');
-            widgetContainer.innerHTML = ''; // Clear the existing content
-
-            // Clear existing widget parameters
-            window.myWidgetParam = [];
-
-            // Add new widget parameters
-            window.myWidgetParam.push({
-                id: 11,
-                cityid: cityId,
-                appid: apiKey,
-                units: 'metric',
-                containerid: 'openweathermap-widget-15',
-            });
-
-            // Load the widget script
-            const script = document.createElement('script');
-            script.async = true;
-            script.charset = "utf-8";
-            script.src = "//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/weather-widget-generator.js";
-            document.getElementsByTagName('head')[0].appendChild(script);
+@if (forecastWeather != null && forecastWeather.List.Count > 0)
+{
+    <div class="d-flex flex-wrap">
+        @foreach(var forecast in forecastWeather.List.Take(3)) // takes 3 upcoming days.
+        {
+            <div class="card m-2" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">@forecast.Dt_txt</h5>
+                    <p>Temp:@(Math.Round(forecast.main.Temp))°C</p>
+                    <p>Condition:@(forecast.weather !=null ? forecast.weather[0]?.Description : "No Data")</p>
+                </div>
+            </div>
         }
-    </script>
-
-</div>
-
-<!--div id="openweathermap-widget-11"></div-->
-<!--script src='//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/d3.min.js'></script-->
-<!--script>window.myWidgetParam ? window.myWidgetParam : window.myWidgetParam = []; window.myWidgetParam.push({ id: 11, cityid: '2711537', appid: '5f547e530c9e01e06ac39e2efeab164c', units: 'metric', containerid: 'openweathermap-widget-11', }); (function () { var script = document.createElement('script'); script.async = true; script.charset = "utf-8"; script.src = "//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/weather-widget-generator.js"; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s); })();</script-->
+    </div>
+}
+else
+{
+    <p>No data available for forecasting try again later.</p>
+}
 
 
 @code {
-    private string cityId; // Default city ID
-    private const string apiKey = "5f547e530c9e01e06ac39e2efeab164c"; // OpenWeather API Key
-    private string? clicked;
+    private string selectedCity = "Gothenburg";
+    private CurrentWeather currentWeather;
+    private ForecastWeather forecastWeather;
 
-    private async Task RefreshWidget()
+    private List<string> Cities = new List<string> {"London",
+    "New York", "Gothenburg", "Tokyo", "Sydney", "Stockholm", "Paris"};
+
+    protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine("Button clicked"); // Debugging log
-        await JSRuntime.InvokeVoidAsync("loadWeatherWidget", cityId, apiKey);
-        clicked = "I've been clicked";
-        StateHasChanged(); // Force UI update if necessary
+        // Fetch weather for the default city (Gothenburg)
+        await FetchWeatherData(selectedCity);
     }
+
+    private async Task OnCityChange(ChangeEventArgs e)
+    {
+        selectedCity = e.Value.ToString();
+        currentWeather = await weatherservice.GetWeatherAsync(selectedCity);
+        forecastWeather = await weatherservice.GetWeatherForecastAsync(selectedCity);
+
+    }
+
+    private async Task FetchWeatherData(string city)
+    {
+        try
+        {
+            currentWeather = await weatherservice.GetWeatherAsync(city);
+            forecastWeather = await weatherservice.GetWeatherForecastAsync(city);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching weather data: {ex.Message}");
+        }
+    }
+
 }

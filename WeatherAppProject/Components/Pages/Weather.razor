@@ -1,83 +1,126 @@
 ﻿@page "/WeatherData"
 @using Microsoft.JSInterop;
 @using WeatherAppProject.Services
+@using WeatherAppProject.Model
 @rendermode InteractiveServer
-@inject IJSRuntime JSRuntime
 @inject WeatherService weatherservice
+
 
 <PageTitle>Weather</PageTitle>
 
 <h1>Weather</h1>
 
-<select @bind="cityId">
-    <option selected>Select a City</option>
-    <option value="2673730">Stockholm</option>
-    <option value="5128581">New York</option>
-    <option value="2643743">London</option>
-    <option value="1850147">Tokyo</option>
-    <option value="5368361">Los Angeles</option>
-    <option value="1816670">Beijing</option>
-    <option value="2711537">Gothenburg</option>
-    <option value="2988507">Paris</option>
-    <option value="3128760">Barcelona</option>
+<select @onchange="OnCityChange" class="form-select">
+    <option disabled selected>Select a city</option>
+    @foreach(var city in Cities)
+    {
+        <option value="@city">@city</option>
+    }
 </select>
 
-<button
-    class="btn btn-success"
-    @onclick="RefreshWidget"
-    disabled="@(string.IsNullOrEmpty(cityId))">
-    Refresh Data
-</button>
+@if (currentWeather != null)
+{
+    <div class="card my-3">
+        <div class="card-body">
+            <h4>Current Weather in @currentWeather.Name</h4>
+            @if (currentWeather.Main != null)
+            {
+                <p>Temperature: @(Math.Round(currentWeather.Main.Temp))°C</p>
+                <p>Humidity: @currentWeather.Main.Humidity%</p>
+            }
+            @if (currentWeather.Weather != null && currentWeather.Weather.Length > 0)
+            {
+                <p>Condition: @currentWeather.Weather[0].Description</p>
+            }
+        </div>
+    </div>
 
+    @if (dailyForecasts?.Count > 0)
+    {
+        <div class="accordion" id="weatherAccordion">
+            @foreach (var dailyForecast in dailyForecasts)
+            {
+                var collapseId = $"collapse-{dailyForecast.Date.Day}";
+                <div class="card">
+                    <div class="card-header" id="heading-@dailyForecast.Date.Day">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                                @dailyForecast.DayName - Temp: @dailyForecast.Temp°C, Condition: @dailyForecast.Condition
+                            </button>
+                        </h5>
+                    </div>
 
-
-
-<div id="openweathermap-widget-15"></div>
-<div class=" mb-3">
-    <script>
-        function loadWeatherWidget(cityId, apiKey) {
-            // Remove the existing widget container
-            const widgetContainer = document.getElementById('openweathermap-widget-15');
-            widgetContainer.innerHTML = ''; // Clear the existing content
-
-            // Clear existing widget parameters
-            window.myWidgetParam = [];
-
-            // Add new widget parameters
-            window.myWidgetParam.push({
-                id: 11,
-                cityid: cityId,
-                appid: apiKey,
-                units: 'metric',
-                containerid: 'openweathermap-widget-15',
-            });
-
-            // Load the widget script
-            const script = document.createElement('script');
-            script.async = true;
-            script.charset = "utf-8";
-            script.src = "//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/weather-widget-generator.js";
-            document.getElementsByTagName('head')[0].appendChild(script);
-        }
-    </script>
-
-</div>
-
-<!--div id="openweathermap-widget-11"></div-->
-<!--script src='//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/d3.min.js'></script-->
-<!--script>window.myWidgetParam ? window.myWidgetParam : window.myWidgetParam = []; window.myWidgetParam.push({ id: 11, cityid: '2711537', appid: '5f547e530c9e01e06ac39e2efeab164c', units: 'metric', containerid: 'openweathermap-widget-11', }); (function () { var script = document.createElement('script'); script.async = true; script.charset = "utf-8"; script.src = "//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/weather-widget-generator.js"; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s); })();</script-->
-
+                    <div id="@collapseId" class="collapse" aria-labelledby="heading-@dailyForecast.Date.Day" data-parent="#weatherAccordion">
+                        <div class="card-body">
+                            @foreach (var item in dailyForecast.HourlyForecasts)
+                            {
+                                <p>
+                                    <strong>@item.Time:</strong> @item.Temp°C, @item.Condition
+                                </p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+}
 
 @code {
-    private string cityId; // Default city ID
-    private const string apiKey = "5f547e530c9e01e06ac39e2efeab164c"; // OpenWeather API Key
-    private string? clicked;
+    private string selectedCity = "Gothenburg";
+    private CurrentWeather currentWeather;
+    private ForecastWeather forecastWeather;
+    private List<DailyForecast> dailyForecasts = new();
 
-    private async Task RefreshWidget()
+
+    private List<string> Cities = new List<string> {"London",
+    "New York", "Gothenburg", "Tokyo", "Sydney", "Stockholm", "Paris"};
+
+    protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine("Button clicked"); // Debugging log
-        await JSRuntime.InvokeVoidAsync("loadWeatherWidget", cityId, apiKey);
-        clicked = "I've been clicked";
-        StateHasChanged(); // Force UI update if necessary
+        // Fetch weather for the default city (Gothenburg)
+        await FetchWeatherData(selectedCity);
     }
+
+    private async Task OnCityChange(ChangeEventArgs e)
+    {
+        selectedCity = e.Value.ToString();
+        await FetchWeatherData(selectedCity);
+    }
+
+    private async Task FetchWeatherData(string city)
+    {
+        try
+        {
+            currentWeather = await weatherservice.GetWeatherAsync(city);
+            forecastWeather = await weatherservice.GetWeatherForecastAsync(city);
+
+            if (forecastWeather?.List != null)
+            {
+                dailyForecasts = forecastWeather.List
+                    .GroupBy(item => DateTime.Parse(item.Dt_txt).Date)
+                    .Select(group => new DailyForecast
+                        {
+                            Date = group.Key,
+                            DayName = group.Key.DayOfWeek.ToString(),
+                            Temp = (int)Math.Round(group.First().main.Temp),
+                            Condition = group.First().weather[0].Description,
+                            HourlyForecasts = group.Select(item => new HourlyForecast
+                            {
+                                Time = DateTime.Parse(item.Dt_txt).ToShortTimeString(),
+                                Temp = (int)Math.Round(item.main.Temp),
+                                Condition = item.weather[0].Description
+                            }).ToList()
+                        })
+                    .Take(3)
+                    .ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching weather data: {ex.Message}");
+        }
+    }
+        
+    
 }

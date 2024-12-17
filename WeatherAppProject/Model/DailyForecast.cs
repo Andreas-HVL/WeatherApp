@@ -19,6 +19,7 @@ namespace WeatherAppProject.Model
         public double Pop { get; set; } // Probability of precipitation (0.0 - 1.0)
         [JsonPropertyName("dt_txt")]
         public string dt { get; set; }
+        public string Time { get; set; }
 
     }
 }

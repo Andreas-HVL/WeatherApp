@@ -23,8 +23,18 @@ namespace WeatherAppProject.Model
         [JsonPropertyName("pop")]
         public double Pop { get; set; } // Probability of precipitation (0.0 - 1.0)
 
+        public Sys Sys { get; set; }
+
+        public Wind Wind { get; set; }
 
     }
+
+    public class Sys
+    {
+        public long Sunrise { get; set; } // Unix timestamp for sunrise
+        public long Sunset { get; set; }  // Unix timestamp for sunset
+    }
+
 
     public class Main
     {
@@ -37,6 +47,13 @@ namespace WeatherAppProject.Model
         public double TempMax { get; set; }
         public double TempMin { get; set; }
     }
+
+    public class Wind
+    {
+        public double Speed { get; set; } // Wind speed in m/s
+        public int Deg { get; set; }      // Wind direction (optional)
+    }
+
     public class Weather
     {
         [JsonPropertyName("description")]
